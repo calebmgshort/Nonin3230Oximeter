@@ -21,6 +21,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,14 +33,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static final int REQUEST_ENABLE_BT = 1;
 
-    private HashMap<String, BTLE_Device> mBTDevicesHashMap;
-    private ArrayList<BTLE_Device> mBTDevicesArrayList;
-    private ListAdapter_BTLE_Devices adapter;
+    //private HashMap<String, BTLE_Device> mBTDevicesHashMap;
+    //private ArrayList<BTLE_Device> mBTDevicesArrayList;
+    //private ListAdapter_BTLE_Devices adapter;
 
     private Button btn_Scan;
+    private TextView oxi_disp;
 
     private BroadcastReceiver_BTState mBTStateUpdateReceiver;
     private Scanner_BTLE mBTLeScanner;
+
+    private BTLE_Device oximeter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +59,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBTStateUpdateReceiver = new BroadcastReceiver_BTState(getApplicationContext());
         mBTLeScanner = new Scanner_BTLE(this, 7500, -75);
 
-        mBTDevicesHashMap = new HashMap<>();
-        mBTDevicesArrayList = new ArrayList<>();
+        oximeter = (BTLE_Device) null;
 
-        adapter = new ListAdapter_BTLE_Devices(this, R.layout.btle_device_list_item, mBTDevicesArrayList);
+        //mBTDevicesHashMap = new HashMap<>();
+        //mBTDevicesArrayList = new ArrayList<>();
 
-        ListView listView = new ListView(this);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
-        ((ScrollView) findViewById(R.id.scrollView)).addView(listView);
+        //adapter = new ListAdapter_BTLE_Devices(this, R.layout.btle_device_list_item, mBTDevicesArrayList);
+
+        //ListView listView = new ListView(this);
+        //listView.setAdapter(adapter);
+        //listView.setOnItemClickListener(this);
+        //((ScrollView) findViewById(R.id.scrollView)).addView(listView);
 
         btn_Scan = (Button) findViewById(R.id.btn_scan);
         findViewById(R.id.btn_scan).setOnClickListener(this);
+
+        oxi_disp = (TextView) findViewById(R.id.oxi_name);
     }
 
     @Override
@@ -146,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /*
     public void addDevice(BluetoothDevice device, int new_rssi) {
         String address = device.getAddress();
 
@@ -163,14 +174,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         adapter.notifyDataSetChanged();
     }
+    */
+
+    // I copied the above function and tweaked it for just the Oximeter
+    public void addDevice(BluetoothDevice device, int new_rssi) {
+        String address = device.getAddress();
+
+        if(oximeter == null){
+            oximeter = new BTLE_Device(device);
+            oximeter.setRSSI(new_rssi);
+
+            oxi_disp.setText(oximeter.getName());
+
+            Utils.toast(getApplicationContext(), "A device was added successfully");
+        }
+        /*else{
+            mBTDevicesHashMap.get(address).setRSSI(new_rssi);
+        }
+
+        adapter.notifyDataSetChanged();*/
+
+    }
 
     public void startScan() {
         btn_Scan.setText("Scanning...");
 
-        mBTDevicesArrayList.clear();
-        mBTDevicesHashMap.clear();
+        //mBTDevicesArrayList.clear();
+        //mBTDevicesHashMap.clear();
 
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
+        oximeter = null;
 
         mBTLeScanner.start();
     }
