@@ -1,5 +1,6 @@
 package com.example.android.nonin3230oximeter;
 
+import android.bluetooth.BluetoothGatt;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static android.R.attr.data;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -39,11 +42,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button btn_Scan;
     private TextView oxi_disp;
+    private TextView data_disp;
 
     private BroadcastReceiver_BTState mBTStateUpdateReceiver;
     private Scanner_BTLE mBTLeScanner;
 
     private BTLE_Device oximeter;
+
+    private GATT_BTLE oximeterGatt;
+
+    private byte[] oximeterData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         oximeter = (BTLE_Device) null;
 
+        oximeterGatt = (GATT_BTLE) null;
+
+        oximeterData = (byte[]) null;
+
         //mBTDevicesHashMap = new HashMap<>();
         //mBTDevicesArrayList = new ArrayList<>();
 
@@ -75,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_scan).setOnClickListener(this);
 
         oxi_disp = (TextView) findViewById(R.id.oxi_name);
+        data_disp = (TextView) findViewById(R.id.oxi_data);
     }
 
     @Override
@@ -87,13 +100,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         stopScan();
+        stopGatt();
     }
 
     @Override
@@ -101,11 +114,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStop();
         unregisterReceiver(mBTStateUpdateReceiver);
         stopScan();
+        stopGatt();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
     }
 
     @Override
@@ -187,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             oxi_disp.setText(oximeter.getName());
 
             Utils.toast(getApplicationContext(), "A device was added successfully");
+
+            startGatt();
         }
         /*else{
             mBTDevicesHashMap.get(address).setRSSI(new_rssi);
@@ -204,13 +221,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //adapter.notifyDataSetChanged();
         oximeter = null;
+        //oxi_disp.setText("");
 
         mBTLeScanner.start();
     }
 
     public void stopScan() {
         btn_Scan.setText("Scan Again");
-
+        if(oximeter == null)
+            oxi_disp.setText("Oximeter not found");
         mBTLeScanner.stop();
+    }
+
+    private void startGatt(){
+        oximeterGatt = new GATT_BTLE(this, oximeter);
+        oximeterGatt.execute();
+    }
+
+    private void stopGatt(){
+        if(oximeterGatt != null)
+            oximeterGatt.stop();
+        clearData();
+    }
+
+    public void updateData(byte[] data){
+        this.oximeterData = data;
+        data_disp.setText(data.toString());
+    }
+
+    public void clearData(){
+        this.oximeterData = null;
+        data_disp.setText("No data recieved at this time");
     }
 }

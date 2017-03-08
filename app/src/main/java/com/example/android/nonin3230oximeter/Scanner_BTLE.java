@@ -7,7 +7,7 @@ import android.content.Context;
 import android.os.Handler;
 
 /**
- * Created by Caleb on 2/25/17.
+ * Created by Caleb on 2/25/17. Copied originally from the internet but then changed for this project
  */
 
 public class Scanner_BTLE {
@@ -90,7 +90,7 @@ public class Scanner_BTLE {
                             @Override
                             public void run(){
                                 ma.addDevice(device, new_rssi);
-                                //Utils.toast(ma.getApplicationContext(), "A device wass added successfully");
+                                //Utils.toast(ma.getApplicationContext(), "A device was added successfully");
                             }
                         });
                     }
