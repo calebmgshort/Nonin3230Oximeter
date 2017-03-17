@@ -67,11 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBTStateUpdateReceiver = new BroadcastReceiver_BTState(getApplicationContext());
         mBTLeScanner = new Scanner_BTLE(this, 7500, -75);
 
-        oximeter = (BTLE_Device) null;
-
-        oximeterGatt = (GATT_BTLE) null;
-
-        oximeterData = (byte[]) null;
+        resetParameters();
 
         //mBTDevicesHashMap = new HashMap<>();
         //mBTDevicesArrayList = new ArrayList<>();
@@ -88,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         oxi_disp = (TextView) findViewById(R.id.oxi_name);
         data_disp = (TextView) findViewById(R.id.oxi_data);
+
+        startScan();
     }
 
     @Override
@@ -201,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             oxi_disp.setText(oximeter.getName());
 
-            Utils.toast(getApplicationContext(), "A device was added successfully");
+            //Utils.toast(getApplicationContext(), "A device was added successfully");
 
             startGatt();
         }
@@ -215,19 +213,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void startScan() {
         btn_Scan.setText("Scanning...");
+        oxi_disp.setText("Oximeter not found");
 
         //mBTDevicesArrayList.clear();
         //mBTDevicesHashMap.clear();
 
         //adapter.notifyDataSetChanged();
-        oximeter = null;
+        //oximeter.device.
+        stopScan();
+        stopGatt();
+        resetParameters();
         //oxi_disp.setText("");
 
         mBTLeScanner.start();
     }
 
     public void stopScan() {
-        btn_Scan.setText("Scan Again");
+        btn_Scan.setText("Re-start Scan");
         if(oximeter == null)
             oxi_disp.setText("Oximeter not found");
         mBTLeScanner.stop();
@@ -239,18 +241,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void stopGatt(){
-        if(oximeterGatt != null)
+        if(oximeterGatt != null) {
             oximeterGatt.stop();
+        }
         clearData();
     }
 
     public void updateData(byte[] data){
         this.oximeterData = data;
         data_disp.setText(data.toString());
+        //Utils.toast(getApplicationContext(), "The updateData function was called");
     }
 
     public void clearData(){
         this.oximeterData = null;
         data_disp.setText("No data recieved at this time");
+    }
+
+    public void resetParameters(){
+        oximeter = null;
+        oximeterGatt = null;
+        oximeterData = null;
     }
 }

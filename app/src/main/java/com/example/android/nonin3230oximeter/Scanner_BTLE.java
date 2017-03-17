@@ -84,7 +84,7 @@ public class Scanner_BTLE {
                     final int new_rssi = rssi;
                     String deviceName = device.getName();
                     //Utils.toast(ma.getApplicationContext(), deviceName);
-                    if(rssi > signalStrength && deviceName.contains("Nonin3230")){
+                    if(rssi > signalStrength && deviceName != null && deviceName.contains("Nonin3230")){
                     //if(rssi > signalStrength){
                         mHandler.post(new Runnable(){
                             @Override
