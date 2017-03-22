@@ -250,7 +250,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void updateData(byte[] data){
         this.oximeterData = data;
-        data_disp.setText(data.toString());
+        int length = (int) data[1];
+        if(length < 9) {
+            Utils.toast(getApplicationContext(), "Insufficient Data");
+            return;
+        }
+        int heartRange = (data[8] << 8) | data[9];
+        int spO = data[7];
+        data_disp.setText("Pulse Rate: " + heartRange + "\n SpO2: " + data[7]);
         //Utils.toast(getApplicationContext(), "The updateData function was called");
     }
 

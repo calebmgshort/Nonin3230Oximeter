@@ -62,7 +62,7 @@ public class GATT_BTLE {
             gatt.setCharacteristicNotification(characteristic, true);
             for (BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                oximeterGatt.writeDescriptor(descriptor);
+                gatt.writeDescriptor(descriptor);
             }
             boolean val = gatt.readCharacteristic(characteristic);
             if(val == false){
