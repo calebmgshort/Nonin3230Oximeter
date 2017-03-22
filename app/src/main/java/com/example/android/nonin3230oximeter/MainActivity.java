@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //Utils.toast(getApplicationContext(), "A device was added successfully");
 
+            stopScan();
             startGatt();
         }
         /*else{
