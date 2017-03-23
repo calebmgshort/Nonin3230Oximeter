@@ -19,7 +19,7 @@ public class BTLE_Device {
 
     public String getAddress() {
         return device.getAddress();
-    }
+    }   // Still unused
 
     public String getName() {
         return device.getName();
@@ -31,5 +31,5 @@ public class BTLE_Device {
 
     public int getRSSI() {
         return rssi;
-    }
+    }                        // Still unused
 }

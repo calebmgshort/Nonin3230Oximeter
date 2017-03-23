@@ -42,6 +42,12 @@ public class GATT_BTLE {
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
                     Log.i("gattCallback", "STATE_DISCONNECTED");
+                    mHandler.post(new Runnable(){
+                        @Override
+                        public void run(){
+                            ma.stopEverything();
+                        }
+                    });
                     break;
                 default:
                     Log.i("gattCallback", "STATE_OTHER");

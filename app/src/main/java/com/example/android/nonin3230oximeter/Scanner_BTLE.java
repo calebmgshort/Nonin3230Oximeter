@@ -86,7 +86,7 @@ public class Scanner_BTLE {
                         mHandler.post(new Runnable(){
                             @Override
                             public void run(){
-                                ma.addDevice(device, new_rssi);
+                                ma.addOximeter(device, new_rssi);
                             }
                         });
                     }

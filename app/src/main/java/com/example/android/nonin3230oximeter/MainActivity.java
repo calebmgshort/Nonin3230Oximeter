@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import static android.R.attr.data;
+import static android.text.TextUtils.concat;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -73,21 +74,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        startScan();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopScan();
-        stopGatt();
+        stopEverything();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(mBTStateUpdateReceiver);
-        stopScan();
-        stopGatt();
+        stopEverything();
     }
 
     @Override
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // I copied the above function and tweaked it for just the Oximeter
-    public void addDevice(BluetoothDevice device, int new_rssi) {
+    public void addOximeter(BluetoothDevice device, int new_rssi) {
         String address = device.getAddress();
         if(oximeter == null){
             oximeter = new BTLE_Device(device);
@@ -156,21 +156,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void startScan() {
+    private void startScan() {
         btn_Scan.setText("Scanning...");
-        oxi_disp.setText("Oximeter not found");
 
-        stopScan();
-        stopGatt();
-        resetParameters();
+        stopEverything();
 
         mBTLeScanner.start();
     }
 
     public void stopScan() {
         btn_Scan.setText("Re-start Scan");
-        if(oximeter == null)
+        if(oximeter == null) {
             oxi_disp.setText("Oximeter not found");
+            data_disp.setText("");
+        }
         mBTLeScanner.stop();
     }
 
@@ -193,19 +192,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             data_disp.setText("Insufficient Data");
             return;
         }
+
+        String textToDisplay = "";
+
         int heartRange = (data[8] << 8) | data[9];
+        if(heartRange == 511)
+            textToDisplay = textToDisplay + "Pulse Rate data missing\n";
+        else
+            textToDisplay = textToDisplay + "Pulse Rate:\t" + heartRange + "\n";
+
         int spO = data[7];
-        data_disp.setText("Pulse Rate: " + heartRange + "\n SpO2: " + data[7]);
+        if(spO == 127)
+            textToDisplay = textToDisplay + "SpO2 data missing\n";
+        else
+            textToDisplay = textToDisplay + "SpO2:\t" + data[7] + "\n";
+
+        textToDisplay = textToDisplay + "\n";
+
+        int correctCheck = (data[1] >> 4) & 1;
+        if(correctCheck == 1)
+            textToDisplay = textToDisplay + "Finger inserted properly\n";
+        else
+            textToDisplay = textToDisplay + "Slide finger further into device*\n";
+
+        int lowBattery = (data[1] >> 5) & 1;
+        if(lowBattery == 1)
+            textToDisplay = textToDisplay + "Batteries are low. Change batteries.\n";
+        else
+            textToDisplay = textToDisplay + "Battery status is good.\n";
+
+        data_disp.setText(textToDisplay);
+        //data_disp.setText("Pulse Rate: " + heartRange + "\n SpO2: " + data[7]);
     }
 
-    public void clearData(){
+    private void clearData(){
         this.oximeterData = null;
         data_disp.setText("No data recieved at this time");
     }
 
-    public void resetParameters(){
+    private void resetParameters(){
         oximeter = null;
         oximeterGatt = null;
         oximeterData = null;
+    }
+
+    public void stopEverything(){
+        stopScan();
+        stopGatt();
+        resetParameters();
+        oxi_disp.setText("Oximeter not found");
+        data_disp.setText("");
     }
 }
