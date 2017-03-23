@@ -12,9 +12,6 @@ import android.os.Handler;
 import java.util.List;
 import java.util.UUID;
 
-import static android.R.attr.data;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-
 /**
  * Created by Caleb on 3/3/17. This class encapsulates the handling of the GATT connection
  */
@@ -66,12 +63,8 @@ public class GATT_BTLE {
             }
             boolean val = gatt.readCharacteristic(characteristic);
             if(val == false){
-                Log.i("onReadCharacteristic", "Read characteristic failed");
+                Log.d("onReadCharacteristic", "Read characteristic failed");
             }
-            //findCharacteristic(services);
-
-            //Utils.toast(ma.getApplicationContext(), "Services discovered successfully");
-            //gatt.readCharacteristic(services.get(1).getCharacteristics().get(0));
 
         }
 
@@ -83,12 +76,10 @@ public class GATT_BTLE {
             if(data == null)
                 Log.i("onGettingData", "The data was null");
             else {
-                Log.i("onGettingData", "The data was not null");
                 mHandler.post(new Runnable(){
                     @Override
                     public void run(){
                         ma.updateData(data);
-                        //Utils.toast(ma.getApplicationContext(), "A device was added successfully");
                     }
                 });
             }
@@ -103,12 +94,10 @@ public class GATT_BTLE {
             if(data == null)
                 Log.i("onGettingData", "The data was null");
             else {
-                Log.i("onGettingData", "The data was not null");
                 mHandler.post(new Runnable(){
                     @Override
                     public void run(){
                         ma.updateData(data);
-                        //Utils.toast(ma.getApplicationContext(), "A device was added successfully");
                     }
                 });
             }
@@ -123,58 +112,8 @@ public class GATT_BTLE {
 
     public void execute(){
         oximeterGatt = oximeter.device.connectGatt(ma.getApplicationContext(), true, oximeterGattCallback);
-
     }
 
-    private void findCharacteristic(List<BluetoothGattService> services){
-        if(services == null)
-            return;
-        for (BluetoothGattService service : services) {
-            String serviceUUID = service.getUuid().toString().toUpperCase();
-            Log.i("Service UUID", serviceUUID);
-            if(serviceUUID.equals(OXIMETER_SERVICE_UUID)) {
-                List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
-                for (BluetoothGattCharacteristic characteristic : characteristics) {
-                    String characteristicUUID = characteristic.getUuid().toString().toUpperCase();
-                    Log.i("Characteristic UUID", characteristicUUID);
-                    if(characteristicUUID.equals(OXIMETER_CHARACTERISTIC_UUID)) {
-                        //oximeterGatt.readCharacteristic(characteristic);
-                        /*
-                        byte[] data = characteristic.getValue();
-                        if(data == null)
-                            Log.i("onGettingData", "The data was null");
-                        else
-                            ma.updateData(data);
-                        */
-
-
-                        for (BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
-                            //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
-                            // and then call setValue on that descriptor
-                            //if(descriptor.)
-                            byte[] value = descriptor.getValue();
-                            if(value != null)
-                                Log.i("Descriptor value", value.toString());
-                            else
-                                Log.i("Descriptor value", "null");
-                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            oximeterGatt.writeDescriptor(descriptor);
-                        }
-                        break;
-                    }
-                    /*
-                    for (BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
-                        //find descriptor UUID that matches Client Characteristic Configuration (0x2902)
-                        // and then call setValue on that descriptor
-
-                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                        oximeterGatt.writeDescriptor(descriptor);
-                    }*/
-                }
-                break;
-            }
-        }
-    }
 
     public void stop(){
         if(oximeterGatt != null) {

@@ -6,10 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -20,14 +16,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import static android.R.attr.data;
 
@@ -35,10 +24,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static String TAG = MainActivity.class.getSimpleName();
 
     public static final int REQUEST_ENABLE_BT = 1;
-
-    //private HashMap<String, BTLE_Device> mBTDevicesHashMap;
-    //private ArrayList<BTLE_Device> mBTDevicesArrayList;
-    //private ListAdapter_BTLE_Devices adapter;
 
     private Button btn_Scan;
     private TextView oxi_disp;
@@ -69,18 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         resetParameters();
 
-        //mBTDevicesHashMap = new HashMap<>();
-        //mBTDevicesArrayList = new ArrayList<>();
-
-        //adapter = new ListAdapter_BTLE_Devices(this, R.layout.btle_device_list_item, mBTDevicesArrayList);
-
-        //ListView listView = new ListView(this);
-        //listView.setAdapter(adapter);
-        //listView.setOnItemClickListener(this);
-        //((ScrollView) findViewById(R.id.scrollView)).addView(listView);
-
         btn_Scan = (Button) findViewById(R.id.btn_scan);
-        findViewById(R.id.btn_scan).setOnClickListener(this);
+        btn_Scan.setOnClickListener(this);
 
         oxi_disp = (TextView) findViewById(R.id.oxi_name);
         data_disp = (TextView) findViewById(R.id.oxi_data);
@@ -127,12 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Check which request we're responding to
         if (requestCode == REQUEST_ENABLE_BT) {
             // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                Utils.toast(getApplicationContext(), "Thank you for turning on Bluetooth");
-            }
-            else if (resultCode == RESULT_CANCELED) {
+            if (resultCode == RESULT_CANCELED)
                 Utils.toast(getApplicationContext(), "Please turn on Bluetooth");
-            }
+            //else if (resultCode == RESULT_OK)
+            //    Utils.toast(getApplicationContext(), "Thank you for turning on Bluetooth");
         }
     }
 
@@ -141,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // Used in future BLE tutorials
+        // Unused
     }
 
     /**
@@ -169,62 +142,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /*
-    public void addDevice(BluetoothDevice device, int new_rssi) {
-        String address = device.getAddress();
-
-        if(!mBTDevicesHashMap.containsKey(address)){
-            BTLE_Device btle_device = new BTLE_Device(device);
-            btle_device.setRSSI(new_rssi);
-
-            mBTDevicesHashMap.put(address, btle_device);
-            mBTDevicesArrayList.add(btle_device);
-            Utils.toast(getApplicationContext(), "A device was added successfully");
-        }
-        else{
-            mBTDevicesHashMap.get(address).setRSSI(new_rssi);
-        }
-
-        adapter.notifyDataSetChanged();
-    }
-    */
-
     // I copied the above function and tweaked it for just the Oximeter
     public void addDevice(BluetoothDevice device, int new_rssi) {
         String address = device.getAddress();
-
         if(oximeter == null){
             oximeter = new BTLE_Device(device);
             oximeter.setRSSI(new_rssi);
 
             oxi_disp.setText(oximeter.getName());
 
-            //Utils.toast(getApplicationContext(), "A device was added successfully");
-
             stopScan();
             startGatt();
         }
-        /*else{
-            mBTDevicesHashMap.get(address).setRSSI(new_rssi);
-        }
-
-        adapter.notifyDataSetChanged();*/
-
     }
 
     public void startScan() {
         btn_Scan.setText("Scanning...");
         oxi_disp.setText("Oximeter not found");
 
-        //mBTDevicesArrayList.clear();
-        //mBTDevicesHashMap.clear();
-
-        //adapter.notifyDataSetChanged();
-        //oximeter.device.
         stopScan();
         stopGatt();
         resetParameters();
-        //oxi_disp.setText("");
 
         mBTLeScanner.start();
     }
@@ -252,13 +190,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.oximeterData = data;
         int length = (int) data[1];
         if(length < 9) {
-            Utils.toast(getApplicationContext(), "Insufficient Data");
+            data_disp.setText("Insufficient Data");
             return;
         }
         int heartRange = (data[8] << 8) | data[9];
         int spO = data[7];
         data_disp.setText("Pulse Rate: " + heartRange + "\n SpO2: " + data[7]);
-        //Utils.toast(getApplicationContext(), "The updateData function was called");
     }
 
     public void clearData(){

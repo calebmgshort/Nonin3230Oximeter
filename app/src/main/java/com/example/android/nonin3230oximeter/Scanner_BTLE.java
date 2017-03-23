@@ -43,7 +43,7 @@ public class Scanner_BTLE {
         if(!Utils.checkBluetooth(mBluetoothAdapter)){
             Utils.requestUserBluetooth(ma);
             ma.stopScan();
-            Utils.toast(ma.getApplicationContext(), "Scan did not start because of mBluetoothAdapter");
+            //Utils.toast(ma.getApplicationContext(), "Scan did not start because of mBluetoothAdapter");
         }
         else{
             scanLeDevice(true);
@@ -56,12 +56,12 @@ public class Scanner_BTLE {
 
     private void scanLeDevice(final boolean enable){
         if(enable && !mScanning) {
-            Utils.toast(ma.getApplication(), "Starting BLE scan...");
+            //Utils.toast(ma.getApplication(), "Starting BLE scan...");
 
             mHandler.postDelayed(new Runnable(){
                 @Override
                 public void run(){
-                    Utils.toast(ma.getApplicationContext(), "Stopping BLE scan...");
+                    //Utils.toast(ma.getApplicationContext(), "Stopping BLE scan...");
 
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -72,7 +72,6 @@ public class Scanner_BTLE {
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
-            //Utils.toast(ma.getApplicationContext(), "mBluetoothAdapter.startLeScan(mLeScanCallback) ran");
         }
     }
 
@@ -83,14 +82,11 @@ public class Scanner_BTLE {
 
                     final int new_rssi = rssi;
                     String deviceName = device.getName();
-                    //Utils.toast(ma.getApplicationContext(), deviceName);
                     if(rssi > signalStrength && deviceName != null && deviceName.contains("Nonin3230")){
-                    //if(rssi > signalStrength){
                         mHandler.post(new Runnable(){
                             @Override
                             public void run(){
                                 ma.addDevice(device, new_rssi);
-                                //Utils.toast(ma.getApplicationContext(), "A device was added successfully");
                             }
                         });
                     }
