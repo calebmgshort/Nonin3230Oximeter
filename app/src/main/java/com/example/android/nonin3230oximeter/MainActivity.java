@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGatt;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import android.bluetooth.BluetoothAdapter;
@@ -13,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -26,9 +28,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static final int REQUEST_ENABLE_BT = 1;
 
-    private Button btn_Scan;
-    private TextView oxi_disp;
-    private TextView data_disp;
+    public Button btn_Scan;
+    public TextView oxi_disp;
+    public TextView data_disp;
 
     private BroadcastReceiver_BTState mBTStateUpdateReceiver;
     private Scanner_BTLE mBTLeScanner;
@@ -39,55 +41,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private byte[] oximeterData;
 
+    Nonin3230Oximeter noninOximeter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Make sure that the phone supports BLE
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)){
-            Utils.toast(getApplicationContext(), "BLE not supported");
-            finish();
+            throw new Nonin3230Oximeter.BluetoothException("BlE not supported");
         }
 
-        mBTStateUpdateReceiver = new BroadcastReceiver_BTState(getApplicationContext());
-        mBTLeScanner = new Scanner_BTLE(this, 7500, -75);
+        noninOximeter = new Nonin3230Oximeter(this);
 
-        resetParameters();
+        //mBTStateUpdateReceiver = new BroadcastReceiver_BTState(getApplicationContext());
+        //mBTLeScanner = new Scanner_BTLE(this, 7500, -75);
+
+        //resetParameters();
 
         btn_Scan = (Button) findViewById(R.id.btn_scan);
         btn_Scan.setOnClickListener(this);
 
         oxi_disp = (TextView) findViewById(R.id.oxi_name);
         data_disp = (TextView) findViewById(R.id.oxi_data);
-
-        startScan();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        noninOximeter.connect();
 
-        registerReceiver(mBTStateUpdateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        //startScan();
+        //registerReceiver(mBTStateUpdateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        //startScan();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        startScan();
+        //startScan();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopEverything();
+        //stopEverything();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(mBTStateUpdateReceiver);
-        stopEverything();
+        noninOximeter.disconnect();
+        //unregisterReceiver(mBTStateUpdateReceiver);
+        //stopEverything();
     }
 
     @Override
@@ -96,14 +102,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
+    @Override       // TODO: figure out how to convert this
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         // Check which request we're responding to
         if (requestCode == REQUEST_ENABLE_BT) {
             // Make sure the request was successful
             if (resultCode == RESULT_CANCELED)
-                Utils.toast(getApplicationContext(), "Please turn on Bluetooth");
+                Log.i("BluetoothConnection", "Please turn on Bluetooth");
+                //Utils.toast(getApplicationContext(), "Please turn on Bluetooth");
+            else if (resultCode == RESULT_OK)
+                Log.i("BluetoothConnection", "Bluetooth is connected");
             //else if (resultCode == RESULT_OK)
             //    Utils.toast(getApplicationContext(), "Thank you for turning on Bluetooth");
         }
@@ -117,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Unused
     }
 
-    /**
+    /**     TODO: Probably remove this
      * Called when the scan button is clicked.
      * @param v The view that was clicked
      */
@@ -130,10 +139,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Utils.toast(getApplicationContext(), "Scan Button Pressed");
 
                 if(!mBTLeScanner.isScanning()){
-                     startScan();
+                     noninOximeter.connect();
                 }
                 else{
-                     stopScan();
+                     noninOximeter.disconnect();
                 }
 
                 break;
@@ -142,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /*
     // I copied the above function and tweaked it for just the Oximeter
     public void addOximeter(BluetoothDevice device, int new_rssi) {
         String address = device.getAddress();
@@ -213,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(correctCheck == 1)
             textToDisplay = textToDisplay + "Finger inserted properly\n";
         else
-            textToDisplay = textToDisplay + "Slide finger further into device*\n";
+            textToDisplay = textToDisplay + "Slide finger further into device\n";
 
         int lowBattery = (data[1] >> 5) & 1;
         if(lowBattery == 1)
@@ -225,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //data_disp.setText("Pulse Rate: " + heartRange + "\n SpO2: " + data[7]);
     }
 
-    private void clearData(){
+    public void clearData(){
         this.oximeterData = null;
         data_disp.setText("No data recieved at this time");
     }
@@ -243,4 +253,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         oxi_disp.setText("Oximeter not found");
         data_disp.setText("");
     }
+    */
 }

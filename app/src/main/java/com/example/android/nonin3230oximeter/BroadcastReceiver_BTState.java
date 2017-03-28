@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Created by Kelvin on 4/18/16.            I copied this from the internet
@@ -25,16 +26,21 @@ public class BroadcastReceiver_BTState extends BroadcastReceiver {
 
             switch (state) {
                 case BluetoothAdapter.STATE_OFF:
-                    Utils.toast(activityContext, "Bluetooth is off");
-                    break;
+                    //Log.i("BluetoothState", "Bluetooth is off");
+                    throw new Nonin3230Oximeter.BluetoothException("Bluetooth is off");
+                    //Utils.toast(activityContext, "Bluetooth is off");
+                    //break;
                 case BluetoothAdapter.STATE_TURNING_OFF:
-                    Utils.toast(activityContext, "Bluetooth is turning off...");
+                    Log.i("BluetoothState", "Bluetooth is turning off...");
+                    //Utils.toast(activityContext, "Bluetooth is turning off...");
                     break;
                 case BluetoothAdapter.STATE_ON:
-                    Utils.toast(activityContext, "Bluetooth is on");
+                    Log.i("BluetoothState", "Bluetooth is on");
+                    //Utils.toast(activityContext, "Bluetooth is on");
                     break;
                 case BluetoothAdapter.STATE_TURNING_ON:
-                    Utils.toast(activityContext, "Bluetooth is turning on...");
+                    Log.i("BluetoothState", "Bluetooth is turning on...");
+                    //Utils.toast(activityContext, "Bluetooth is turning on...");
                     break;
             }
         }

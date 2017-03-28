@@ -20,7 +20,7 @@ public class GATT_BTLE {
 
     private BTLE_Device oximeter;
     private BluetoothGatt oximeterGatt;
-    private MainActivity ma;
+    private Nonin3230Oximeter parent;
     private Handler mHandler;
 
     private static final UUID OXIMETER_SERVICE_UUID = UUID.fromString("46A970E0-0D5F-11E2-8B5E-0002A5D5C51B");
@@ -45,7 +45,7 @@ public class GATT_BTLE {
                     mHandler.post(new Runnable(){
                         @Override
                         public void run(){
-                            ma.stopEverything();
+                            parent.clearData();
                         }
                     });
                     break;
@@ -67,28 +67,12 @@ public class GATT_BTLE {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
             }
+            /*
             boolean val = gatt.readCharacteristic(characteristic);
             if(val == false){
                 Log.d("onReadCharacteristic", "Read characteristic failed");
             }
-
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            String characteristicUUID = characteristic.getUuid().toString().toUpperCase();
-            Log.i("onCharacteristicRead", characteristicUUID);
-            final byte[] data = characteristic.getValue();
-            if(data == null)
-                Log.i("onGettingData", "The data was null");
-            else {
-                mHandler.post(new Runnable(){
-                    @Override
-                    public void run(){
-                        ma.updateData(data);
-                    }
-                });
-            }
+            */
         }
 
         @Override
@@ -103,21 +87,21 @@ public class GATT_BTLE {
                 mHandler.post(new Runnable(){
                     @Override
                     public void run(){
-                        ma.updateData(data);
+                        parent.updateData(data);
                     }
                 });
             }
         }
     };
 
-    public GATT_BTLE(MainActivity ma, BTLE_Device oximeter){
+    public GATT_BTLE(Nonin3230Oximeter parent, BTLE_Device oximeter){
         this.oximeter = oximeter;
-        this.ma = ma;
+        this.parent = parent;
         this.mHandler = new Handler();
     }
 
     public void execute(){
-        oximeterGatt = oximeter.device.connectGatt(ma.getApplicationContext(), true, oximeterGattCallback);
+        oximeterGatt = oximeter.device.connectGatt(parent.ma.getApplicationContext(), true, oximeterGattCallback);
     }
 
 

@@ -12,7 +12,7 @@ import android.os.Handler;
 
 public class Scanner_BTLE {
 
-    private MainActivity ma;
+    private Nonin3230Oximeter parent;
 
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -21,8 +21,8 @@ public class Scanner_BTLE {
     private long scanPeriod;
     private int signalStrength;
 
-    public Scanner_BTLE(MainActivity mainActivity, long scanPeriod, int signalStrength){
-        ma = mainActivity;
+    public Scanner_BTLE(Nonin3230Oximeter parentClass, long scanPeriod, int signalStrength){
+        parent = parentClass;
 
         mHandler = new Handler();
 
@@ -30,7 +30,7 @@ public class Scanner_BTLE {
         this.signalStrength = signalStrength;
 
         final BluetoothManager bluetoothManager =
-                (BluetoothManager) ma.getSystemService(Context.BLUETOOTH_SERVICE);
+                (BluetoothManager) parent.ma.getSystemService(Context.BLUETOOTH_SERVICE);
 
         mBluetoothAdapter = bluetoothManager.getAdapter();
     }
@@ -41,8 +41,8 @@ public class Scanner_BTLE {
 
     public void start(){
         if(!Utils.checkBluetooth(mBluetoothAdapter)){
-            Utils.requestUserBluetooth(ma);
-            ma.stopScan();
+            Utils.requestUserBluetooth(parent.ma);
+            parent.stopScan();
             //Utils.toast(ma.getApplicationContext(), "Scan did not start because of mBluetoothAdapter");
         }
         else{
@@ -66,7 +66,7 @@ public class Scanner_BTLE {
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
-                    ma.stopScan();
+                    parent.stopScan();
                 }
             }, scanPeriod);
 
@@ -86,7 +86,7 @@ public class Scanner_BTLE {
                         mHandler.post(new Runnable(){
                             @Override
                             public void run(){
-                                ma.addOximeter(device, new_rssi);
+                                parent.addOximeter(device, new_rssi);
                             }
                         });
                     }
