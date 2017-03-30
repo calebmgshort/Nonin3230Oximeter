@@ -1,12 +1,12 @@
 package com.example.android.nonin3230oximeter;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.os.Message;
 
 /**
  * Created by Caleb on 3/24/17.
@@ -17,14 +17,21 @@ public class Nonin3230Oximeter {
     public MainActivity ma;
     public static final int REQUEST_ENABLE_BT = 1;
 
+    public static final String HEART_RATE = "Heart Rate";
+    public static final String SPO2_VALUE = "SPO2 Value";
+    public static final String FINGER_INSTERTED_PROPERLY = "Finger Inserted Properly";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+
     private BroadcastReceiver_BTState mBTStateUpdateReceiver;
     private BTLE_Device oximeter;
     private Scanner_BTLE mBTLeScanner;
     private GATT_BTLE oximeterGatt;
-    private byte[] oximeterData;
+    private Handler dataHandler;
 
-    public Nonin3230Oximeter(MainActivity ma){
+    public Nonin3230Oximeter(MainActivity ma, Handler handler){
         this.ma = ma;
+        this.dataHandler = handler;
 
         // Make sure that the phone supports BLE
         if(!ma.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)){
@@ -34,6 +41,7 @@ public class Nonin3230Oximeter {
         mBTStateUpdateReceiver = new BroadcastReceiver_BTState(ma.getApplicationContext());
         mBTLeScanner = new Scanner_BTLE(this, 7500, -75);
 
+        resetParameters();
     }
 
     // Force the class using Nonin3230Oximeter to handle Bluetooth Problems and such with a custom
@@ -49,7 +57,7 @@ public class Nonin3230Oximeter {
 
     // Allows another class to connect to the oximeter
     public void connect(){
-        disconnect();
+        stopEverything();
         startScan();
         ma.registerReceiver(mBTStateUpdateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
     }
@@ -58,11 +66,6 @@ public class Nonin3230Oximeter {
     public void disconnect(){
         ma.unregisterReceiver(mBTStateUpdateReceiver);
         stopEverything();
-    }
-
-    // Allows another class to instantiate a Handler through which messages about the data will be sent
-    public void registerMHandler(Handler mHandler){
-
     }
 
     // This function is used to instantiate the oximeter
@@ -105,57 +108,52 @@ public class Nonin3230Oximeter {
         if(oximeterGatt != null) {
             oximeterGatt.stop();
         }
-        clearData();
+        ma.data_disp.setText("");
     }
 
     public void updateData(byte[] data){
-        this.oximeterData = data;
+        // Get message and bundle
+        Message message = Message.obtain();
+        Bundle bundle = new Bundle();
+
         int length = (int) data[1];
         if(length < 9) {
-            ma.data_disp.setText("Insufficient Data");
+            bundle.putInt(HEART_RATE, -1);
+            bundle.putInt(SPO2_VALUE, -1);
+            bundle.putString(FINGER_INSTERTED_PROPERLY, FALSE);
+            message.setData(bundle);
+            dataHandler.sendMessage(message);
             return;
         }
 
-        String textToDisplay = "";
-
+        // Send message for heart rate
         int heartRange = (data[8] << 8) | data[9];
         if(heartRange == 511)
-            textToDisplay = textToDisplay + "Pulse Rate data missing\n";
+            bundle.putInt(HEART_RATE, -1);
         else
-            textToDisplay = textToDisplay + "Pulse Rate:\t" + heartRange + "\n";
+            bundle.putInt(HEART_RATE, heartRange);
 
+        // Send message for spO2 value
         int spO = data[7];
         if(spO == 127)
-            textToDisplay = textToDisplay + "SpO2 data missing\n";
+            bundle.putInt(SPO2_VALUE, -1);
         else
-            textToDisplay = textToDisplay + "SpO2:\t" + data[7] + "\n";
+            bundle.putInt(SPO2_VALUE, spO);
 
-        textToDisplay = textToDisplay + "\n";
-
+        // Send message for whether the finger is inserted properly
         int correctCheck = (data[1] >> 4) & 1;
         if(correctCheck == 1)
-            textToDisplay = textToDisplay + "Finger inserted properly\n";
+            bundle.putString(FINGER_INSTERTED_PROPERLY, TRUE);
         else
-            textToDisplay = textToDisplay + "Slide finger further into device\n";
+            bundle.putString(FINGER_INSTERTED_PROPERLY, FALSE);
 
-        int lowBattery = (data[1] >> 5) & 1;
-        if(lowBattery == 1)
-            textToDisplay = textToDisplay + "Batteries are low. Change batteries.\n";
-        else
-            textToDisplay = textToDisplay + "Battery status is good.\n";
-
-        ma.data_disp.setText(textToDisplay);
-    }
-
-    public void clearData(){
-        this.oximeterData = null;
-        ma.data_disp.setText("No data recieved at this time");
+        message.setData(bundle);
+        dataHandler.sendMessage(message);
     }
 
     private void resetParameters(){
         oximeter = null;
         oximeterGatt = null;
-        oximeterData = null;
     }
 
     public void stopEverything(){
@@ -164,6 +162,13 @@ public class Nonin3230Oximeter {
         resetParameters();
         ma.oxi_disp.setText("Oximeter not found");
         ma.data_disp.setText("");
+    }
+
+    // Temperary function
+    public boolean isScanning(){
+        if(mBTLeScanner == null)
+            return false;
+        return mBTLeScanner.isScanning();
     }
 
 }

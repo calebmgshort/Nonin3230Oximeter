@@ -42,12 +42,6 @@ public class GATT_BTLE {
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
                     Log.i("gattCallback", "STATE_DISCONNECTED");
-                    mHandler.post(new Runnable(){
-                        @Override
-                        public void run(){
-                            parent.clearData();
-                        }
-                    });
                     break;
                 default:
                     Log.i("gattCallback", "STATE_OTHER");
@@ -57,8 +51,6 @@ public class GATT_BTLE {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            // this will get called after the client initiates a BluetoothGatt.discoverServices() call
-            List<BluetoothGattService> services = gatt.getServices();
             Log.i("onServicesDiscovered", "" + status);
             BluetoothGattCharacteristic characteristic = gatt.getService(OXIMETER_SERVICE_UUID).getCharacteristic(OXIMETER_CHARACTERISTIC_UUID);
             Log.i("characteristic found", characteristic.getUuid().toString());
@@ -67,12 +59,6 @@ public class GATT_BTLE {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
             }
-            /*
-            boolean val = gatt.readCharacteristic(characteristic);
-            if(val == false){
-                Log.d("onReadCharacteristic", "Read characteristic failed");
-            }
-            */
         }
 
         @Override

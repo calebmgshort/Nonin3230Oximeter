@@ -7,7 +7,8 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * Created by Kelvin on 4/18/16.            I copied this from the internet
+ * Created by Kelvin on 4/18/16.            I copied this from the internet and altered it
+ *                                          It provides info for the bluetooth connection
  */
 public class BroadcastReceiver_BTState extends BroadcastReceiver {
 
@@ -26,21 +27,17 @@ public class BroadcastReceiver_BTState extends BroadcastReceiver {
 
             switch (state) {
                 case BluetoothAdapter.STATE_OFF:
-                    //Log.i("BluetoothState", "Bluetooth is off");
-                    throw new Nonin3230Oximeter.BluetoothException("Bluetooth is off");
-                    //Utils.toast(activityContext, "Bluetooth is off");
-                    //break;
+                    Log.i("BluetoothState", "Bluetooth is off");
+                    //throw new Nonin3230Oximeter.BluetoothException("Bluetooth is off");
+                    break;
                 case BluetoothAdapter.STATE_TURNING_OFF:
                     Log.i("BluetoothState", "Bluetooth is turning off...");
-                    //Utils.toast(activityContext, "Bluetooth is turning off...");
                     break;
                 case BluetoothAdapter.STATE_ON:
                     Log.i("BluetoothState", "Bluetooth is on");
-                    //Utils.toast(activityContext, "Bluetooth is on");
                     break;
                 case BluetoothAdapter.STATE_TURNING_ON:
                     Log.i("BluetoothState", "Bluetooth is turning on...");
-                    //Utils.toast(activityContext, "Bluetooth is turning on...");
                     break;
             }
         }

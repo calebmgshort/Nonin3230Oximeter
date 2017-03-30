@@ -40,10 +40,13 @@ public class Scanner_BTLE {
     }
 
     public void start(){
-        if(!Utils.checkBluetooth(mBluetoothAdapter)){
-            Utils.requestUserBluetooth(parent.ma);
+        if (mBluetoothAdapter == null){
             parent.stopScan();
-            //Utils.toast(ma.getApplicationContext(), "Scan did not start because of mBluetoothAdapter");
+            throw new Nonin3230Oximeter.BluetoothException("Bluetooth is not available.");
+        }
+        else if(!mBluetoothAdapter.isEnabled()){
+            parent.stopScan();
+            throw new Nonin3230Oximeter.BluetoothException("Bluetooth is not enabled.");
         }
         else{
             scanLeDevice(true);
@@ -56,13 +59,9 @@ public class Scanner_BTLE {
 
     private void scanLeDevice(final boolean enable){
         if(enable && !mScanning) {
-            //Utils.toast(ma.getApplication(), "Starting BLE scan...");
-
             mHandler.postDelayed(new Runnable(){
                 @Override
                 public void run(){
-                    //Utils.toast(ma.getApplicationContext(), "Stopping BLE scan...");
-
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
