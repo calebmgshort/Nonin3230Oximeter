@@ -24,7 +24,7 @@ public class Nonin3230Oximeter {
     public static final String FALSE = "false";
 
     private BroadcastReceiver_BTState mBTStateUpdateReceiver;
-    private BTLE_Device oximeter;
+    private BluetoothDevice oximeter;
     private Scanner_BTLE mBTLeScanner;
     private GATT_BTLE oximeterGatt;
     private Handler dataHandler;
@@ -69,11 +69,9 @@ public class Nonin3230Oximeter {
     }
 
     // This function is used to instantiate the oximeter
-    public void addOximeter(BluetoothDevice device, int new_rssi) {
-        String address = device.getAddress();
+    public void addOximeter(BluetoothDevice device) {
         if(oximeter == null){
-            oximeter = new BTLE_Device(device);
-            oximeter.setRSSI(new_rssi);
+            oximeter = device;
 
             ma.oxi_disp.setText(oximeter.getName());
 
@@ -171,4 +169,4 @@ public class Nonin3230Oximeter {
         return mBTLeScanner.isScanning();
     }
 
-}
+}   // TODO: Remove lines of code changing text in MainActivitys

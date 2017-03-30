@@ -1,5 +1,6 @@
 package com.example.android.nonin3230oximeter;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -9,7 +10,6 @@ import android.bluetooth.BluetoothProfile;
 import android.util.Log;
 import android.os.Handler;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class GATT_BTLE {
 
-    private BTLE_Device oximeter;
+    private BluetoothDevice oximeter;
     private BluetoothGatt oximeterGatt;
     private Nonin3230Oximeter parent;
     private Handler mHandler;
@@ -80,16 +80,15 @@ public class GATT_BTLE {
         }
     };
 
-    public GATT_BTLE(Nonin3230Oximeter parent, BTLE_Device oximeter){
+    public GATT_BTLE(Nonin3230Oximeter parent, BluetoothDevice oximeter){
         this.oximeter = oximeter;
         this.parent = parent;
         this.mHandler = new Handler();
     }
 
     public void execute(){
-        oximeterGatt = oximeter.device.connectGatt(parent.ma.getApplicationContext(), true, oximeterGattCallback);
+        oximeterGatt = oximeter.connectGatt(parent.ma.getApplicationContext(), true, oximeterGattCallback);
     }
-
 
     public void stop(){
         if(oximeterGatt != null) {

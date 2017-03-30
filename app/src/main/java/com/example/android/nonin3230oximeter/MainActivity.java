@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Unused
     }
 
-    /**     TODO: Probably remove this
+    /**
      * Called when the scan button is clicked.
      * @param v The view that was clicked
      */

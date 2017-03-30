@@ -8,6 +8,7 @@ import android.os.Handler;
 
 /**
  * Created by Caleb on 2/25/17. Copied originally from the internet but then changed for this project
+ * Purpose: This class handles the scanning for the oximeter and giving the oximeter to the parent class
  */
 
 public class Scanner_BTLE {
@@ -79,13 +80,12 @@ public class Scanner_BTLE {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord){
 
-                    final int new_rssi = rssi;
                     String deviceName = device.getName();
                     if(rssi > signalStrength && deviceName != null && deviceName.contains("Nonin3230")){
                         mHandler.post(new Runnable(){
                             @Override
                             public void run(){
-                                parent.addOximeter(device, new_rssi);
+                                parent.addOximeter(device);
                             }
                         });
                     }
