@@ -20,26 +20,24 @@
         android:id="@+id/scrollView">
     </ScrollView>
     -->
-
-    <TextView
-        android:id="@+id/oxi_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp"
-        android:text="Oximeter not detected" />
-
-    <TextView
-        android:id="@+id/oxi_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp"
-        android:text="" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Re-start Scan"
-        android:id="@+id/btn_scan"/>
-
-</LinearLayout>
+    <!--
+        <TextView
+            android:id="@+id/oxi_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:text="Oximeter not detected" />
+    -->
+        <TextView
+            android:id="@+id/oxi_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:text="" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Re-start Scan"
+            android:id="@+id/btn_scan"/>
+    </LinearLayout>

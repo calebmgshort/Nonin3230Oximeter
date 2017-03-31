@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_Scan = (Button) findViewById(R.id.btn_scan);
         btn_Scan.setOnClickListener(this);
 
-        oxi_disp = (TextView) findViewById(R.id.oxi_name);
         data_disp = (TextView) findViewById(R.id.oxi_data);
     }
 

@@ -72,28 +72,18 @@ public class Nonin3230Oximeter {
     public void addOximeter(BluetoothDevice device) {
         if(oximeter == null){
             oximeter = device;
-
-            ma.oxi_disp.setText(oximeter.getName());
-
             stopScan();
             startGatt();
         }
     }
 
     private void startScan() {
-        ma.btn_Scan.setText("Scanning...");
-
         stopEverything();
 
         mBTLeScanner.start();
     }
 
     public void stopScan() {
-        ma.btn_Scan.setText("Re-start Scan");
-        if(oximeter == null) {
-            ma.oxi_disp.setText("Oximeter not found");
-            ma.data_disp.setText("");
-        }
         mBTLeScanner.stop();
     }
 
@@ -106,7 +96,6 @@ public class Nonin3230Oximeter {
         if(oximeterGatt != null) {
             oximeterGatt.stop();
         }
-        ma.data_disp.setText("");
     }
 
     public void updateData(byte[] data){
@@ -158,8 +147,6 @@ public class Nonin3230Oximeter {
         stopScan();
         stopGatt();
         resetParameters();
-        ma.oxi_disp.setText("Oximeter not found");
-        ma.data_disp.setText("");
     }
 
     // Temperary function
@@ -169,4 +156,4 @@ public class Nonin3230Oximeter {
         return mBTLeScanner.isScanning();
     }
 
-}   // TODO: Remove lines of code changing text in MainActivity
+}
