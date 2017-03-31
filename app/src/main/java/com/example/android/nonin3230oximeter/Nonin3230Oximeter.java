@@ -169,4 +169,4 @@ public class Nonin3230Oximeter {
         return mBTLeScanner.isScanning();
     }
 
-}   // TODO: Remove lines of code changing text in MainActivitys
+}   // TODO: Remove lines of code changing text in MainActivity
